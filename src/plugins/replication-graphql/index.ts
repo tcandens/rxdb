@@ -71,11 +71,13 @@ export class RxGraphQLReplicationState<RxDocType> {
         public readonly deletedFlag: string,
         public readonly live: boolean,
         public liveInterval: number,
-        public retryTime: number
+        public retryTime: number,
+        public credentials: 'include' | 'omit' | 'same-origin'
     ) {
         this.client = GraphQLClient({
             url,
-            headers
+            headers,
+            credentials,
         });
         this.endpointHash = hash(url);
         this._prepare();
@@ -478,7 +480,8 @@ export function syncGraphQL(
         live = false,
         liveInterval = 1000 * 10, // in ms
         retryTime = 1000 * 5, // in ms
-        autoStart = true // if this is false, the replication does nothing at start
+        autoStart = true, // if this is false, the replication does nothing at start
+        credentials = 'same-origin'
     }: any
 ) {
     const collection = this;
@@ -500,7 +503,8 @@ export function syncGraphQL(
         deletedFlag,
         live,
         liveInterval,
-        retryTime
+        retryTime,
+        credentials
     );
 
     if (!autoStart) {
